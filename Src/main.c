@@ -4,7 +4,7 @@
   * @file           : main.c
   * @author			: 宋裕恒
   * @brief			: 本程序适用于H743\H753开发板，包括光纤惯导、XSense惯导、UWB位置传感器、深度传感器
-  * @introduction	: USART6->XSense惯导、  UART7->深度传感器、  UART5->与RCT6通信、  USART2->光纤惯导、  USART1->UWB
+  * @introduction	: USART6->XSense惯导、  UART7->深度传感器、  UART5->与RCT6通信74800、  USART2->光纤惯导、  USART1->UWB
   * @attention		:
   ******************************************************************************
   * @attention
@@ -23,6 +23,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "dma.h"
+#include "memorymap.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -40,6 +41,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>   // 添加布尔类型支持
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -61,7 +63,45 @@
 
 /* USER CODE BEGIN PV */
 
-int b = 0;
+
+
+/*黄远标主要修改内容：修改的内容形式为：
+
+//注释内容
+修改本部分
+//注释内容
+
+1.拖过检测当前时间与上一次接收时间的差作为有无uwb信号的依据：
+
+     通过时间戳判断UWB数据是否超时
+
+     设置超时时间为200ms
+
+2.在UWB中断中更新时间戳：
+
+     当收到UWB数据时，更新last_uwb_time
+
+3.修改位置解算逻辑：
+
+     当uwb_valid_flag为真，使用UWB解算的XY位置
+
+     当uwb_valid_flag为假，使用DVL解算的XY位置
+
+4.在数据帧中添加UWB状态：
+
+     将uwb_valid_flag值添加到Deta[2]位置，用于指示UWB信号状态
+
+5.在主循环中定期检查UWB信号：
+
+     每次循环都调用检测时间差来更新UWB状态
+*/
+
+
+
+//增加的指示位
+bool uwb_valid_flag = true; // UWB信号状态指示：无uwb为假，使用dvl推位计算位置，有uwb为真，使用uwb信号计算位置
+//增加的指示位
+
 
 //以下为实际输出变量声明
 DVL_Parser_t dvl_parser;
@@ -95,6 +135,12 @@ float speed_q;
 float speed_r;
 
 
+// 判断有无UWB相关变量依据
+uint32_t last_uwb_time = 0;
+#define UWB_TIMEOUT 200  // UWB超时时间200ms
+// 判断有无UWB相关变量依据
+
+
 //定义发送的数组
 uint8_t Xpos[4] = {0};//X
 uint8_t Ypos[4] = {0};
@@ -113,7 +159,13 @@ uint8_t q_vlocity[4] = {0};
 uint8_t r_vlocity[4] = {0};
 
 
-uint8_t Deta[51] = {0};//最后的数据
+//从51变成了52，多了指示位zsw
+uint8_t Deta[52] = {0};//最后的数据
+//从51变成了52，多了指示位zsw
+
+
+
+
 
 uint8_t UART6_Rec_Buf[50] = {0};
 uint8_t UART7_Rec_Buf[50] = {0};
@@ -142,72 +194,86 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 float get_D_value(void) { return D_value; }
 void Navigation_Task(void);
+
+
+
+
+
+
+
+
+
 void Fuzhi()
 {
-  Deta[0] = 0xFE;
+	Deta[0] = 0xFE;
 	Deta[1] = 0x01;
 	
-	Deta[2] = Xpos[0];
-	Deta[3] = Xpos[1];
-	Deta[4] = Xpos[2];
-	Deta[5] = Xpos[3];
+	//新增的uwb指示位置
+	Deta[2] = uwb_valid_flag;
+	//新增的uwb指示位置
 	
-	Deta[6] = Ypos[0];
-	Deta[7] = Ypos[1];
-	Deta[8] = Ypos[2];
-	Deta[9] = Ypos[3];
 	
-	Deta[10] = Depth[0];
-	Deta[11] = Depth[1];
-	Deta[12] = Depth[2];
-	Deta[13] = Depth[3];
+	Deta[3] = Xpos[0];
+	Deta[4] = Xpos[1];
+	Deta[5] = Xpos[2];
+	Deta[6] = Xpos[3];
 	
-	Deta[14] = Roll[0];
-	Deta[15] = Roll[1];
-	Deta[16] = Roll[2];
-	Deta[17] = Roll[3];
+	Deta[7] = Ypos[0];
+	Deta[8] = Ypos[1];
+	Deta[9] = Ypos[2];
+	Deta[10] = Ypos[3];
 	
-	Deta[18] = pitch[0];
-	Deta[19] = pitch[1];
-	Deta[20] = pitch[2];
-	Deta[21] = pitch[3];
+	Deta[11] = Depth[0];
+	Deta[12] = Depth[1];
+	Deta[13] = Depth[2];
+	Deta[14] = Depth[3];
 	
-	Deta[22] = yaw[0];
-	Deta[23] = yaw[1];
-	Deta[24] = yaw[2];
-	Deta[25] = yaw[3];
+	Deta[15] = Roll[0];
+	Deta[16] = Roll[1];
+	Deta[17] = Roll[2];
+	Deta[18] = Roll[3];
 	
-	Deta[26] = u_vlocity[0];
-	Deta[27] = u_vlocity[1];
-	Deta[28] = u_vlocity[2];
-	Deta[29] = u_vlocity[3];
+	Deta[19] = pitch[0];
+	Deta[20] = pitch[1];
+	Deta[21] = pitch[2];
+	Deta[22] = pitch[3];
 	
-  Deta[30] = v_vlocity[0];
-	Deta[31] = v_vlocity[1];
-	Deta[32] = v_vlocity[2];
-	Deta[33] = v_vlocity[3];
+	Deta[23] = yaw[0];
+	Deta[24] = yaw[1];
+	Deta[25] = yaw[2];
+	Deta[26] = yaw[3];
 	
-	Deta[34] = w_vlocity[0];
-	Deta[35] = w_vlocity[1];
-	Deta[36] = w_vlocity[2];
-	Deta[37] = w_vlocity[3];
+	Deta[27] = u_vlocity[0];
+	Deta[28] = u_vlocity[1];
+	Deta[29] = u_vlocity[2];
+	Deta[30] = u_vlocity[3];
 	
-	Deta[38] = p_vlocity[0];
-	Deta[39] = p_vlocity[1];
-	Deta[40] = p_vlocity[2];
-	Deta[41] = p_vlocity[3];
+	Deta[31] = v_vlocity[0];
+	Deta[32] = v_vlocity[1];
+	Deta[33] = v_vlocity[2];
+	Deta[34] = v_vlocity[3];
 	
-	Deta[42] = q_vlocity[0];
-	Deta[43] = q_vlocity[1];
-	Deta[44] = q_vlocity[2];
-	Deta[45] = q_vlocity[3];
+	Deta[35] = w_vlocity[0];
+	Deta[36] = w_vlocity[1];
+	Deta[37] = w_vlocity[2];
+	Deta[38] = w_vlocity[3];
 	
-	Deta[46] = r_vlocity[0];
-	Deta[47] = r_vlocity[1];
-	Deta[48] = r_vlocity[2];
-	Deta[49] = r_vlocity[3];
+	Deta[39] = p_vlocity[0];
+	Deta[40] = p_vlocity[1];
+	Deta[41] = p_vlocity[2];
+	Deta[42] = p_vlocity[3];
 	
-	Deta[50] = 0xFF;
+	Deta[43] = q_vlocity[0];
+	Deta[44] = q_vlocity[1];
+	Deta[45] = q_vlocity[2];
+	Deta[46] = q_vlocity[3];
+	
+	Deta[47] = r_vlocity[0];
+	Deta[48] = r_vlocity[1];
+	Deta[49] = r_vlocity[2];
+	Deta[50] = r_vlocity[3];
+	
+	Deta[51] = 0xFF;
 
 }
 
@@ -217,6 +283,12 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)//串口中断回调函数
 	static uint8_t rxd2_state = 0;//串口2的状态 --0：等待包头；1：接收数据；2：等待帧尾
 	static uint8_t rxd6_state = 0;//串口6的状态 --0：等待包头；1：接收数据；2：等待帧尾
 	static uint8_t rxd7_state = 0;//串口7的状态 --0：等待包头；1：接收数据；2：等待帧尾
+	
+	
+	//新增的uwb串口
+	static uint8_t rxd3_state = 0;//串口3的状态 --0：等待包头；1：接收数据；2：等待帧尾
+	//新增的uwb串口
+	
 	
 	//DVL数据储存程序
 	if(huart->Instance == USART1)
@@ -329,7 +401,63 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)//串口中断回调函数
             Depth_rx_line[Depth_rx_index++] = ch;
         }
 		 HAL_UART_Receive_IT(&huart7, (uint8_t *)&Depth_rx_buffer, 1);	// 重新开启接收中断	
-	}					
+	}
+
+	
+	
+	//新增的UWB数据储存程序
+	if(huart->Instance == USART3)
+	{
+		switch(rxd3_state)
+					{
+						case 0:
+							if((aRxBuffer3 == 0x55) && (rxd3_head == 0))
+							{
+								rxd3_head = 1;
+							}
+							else if((aRxBuffer3 == 0x01) && (rxd3_head == 1))
+							{
+								rxd3_head = 2;
+							}
+							else if((aRxBuffer3 == 0x00) && (rxd3_head == 2))
+							{
+								rxd3_state = 1;
+								rxd3_head = 0;
+								rxd3_index = 0;
+								
+								// 收到UWB数据，更新时间戳
+								last_uwb_time = HAL_GetTick();
+								// 收到UWB数据，更新时间戳
+								
+								
+							}
+							else 
+							{
+								rxd3_state = 0;
+								rxd3_head = 0;
+							}
+						  break;						
+							
+						case 1:
+							rxd3_buffer[rxd3_index] = aRxBuffer3; // 转存接收到的数据
+							rxd3_index++;
+						  if(rxd3_index >= 124)
+							{
+								rxd3_state = 2;
+							}
+						  break;
+							
+						case 2:
+								rxd3_flag = 1;
+								rxd3_state = 0;
+								rxd3_index = 0;
+						  break;						
+					}
+		 HAL_UART_Receive_IT(&huart3, (uint8_t *)&aRxBuffer3, 1);	// 重新开启接收中断	
+	 }			
+	//新增的UWB数据储存程序
+	 
+	 
 	
 }		
 
@@ -351,7 +479,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         if (huart5.gState == HAL_UART_STATE_READY)
         {
 			    Fuzhi();
-			    HAL_UART_Transmit_IT(&huart5, Deta, 51);
+			    HAL_UART_Transmit_IT(&huart5, Deta, 52);
 					//Angle = Angle+0.0003;
 					
 
@@ -400,7 +528,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_USART6_UART_Init();
   MX_TIM3_Init();
-	
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
 	 
@@ -419,12 +547,32 @@ int main(void)
 	 DR_SetConfig(&dr, &config);
 		
 	 DVL_Init(&dvl_parser, &huart1);
-	 HAL_UART_Receive_IT(&huart1, &dvl_rx_byte, 1);
-	 
-	 HAL_UART_Receive_IT(&huart2, (uint8_t *)&aRxBuffer2, 1);
-	 HAL_UART_Receive_IT(&huart6, (uint8_t *)&aRxBuffer6, 1);
-	 HAL_UART_Receive_IT(&huart7, (uint8_t *)&Depth_rx_buffer, 1);
 	
+//原来是中断，并没有开启DMA,	
+//	 HAL_UART_Receive_IT(&huart1, &dvl_rx_byte, 1);
+//	 
+//	 HAL_UART_Receive_IT(&huart2, (uint8_t *)&aRxBuffer2, 1);
+//	
+//	//开启新增的串口接收
+//	 HAL_UART_Receive_IT(&huart3, (uint8_t *)&aRxBuffer3, 1);
+//	//开启新增的串口接收
+//	
+//	 HAL_UART_Receive_IT(&huart6, (uint8_t *)&aRxBuffer6, 1);
+//	 HAL_UART_Receive_IT(&huart7, (uint8_t *)&Depth_rx_buffer, 1);
+	
+	
+//DMA开启
+	 HAL_UART_Receive_DMA(&huart1, &dvl_rx_byte, 1);
+	 
+	  HAL_UART_Receive_DMA(&huart2, (uint8_t *)&aRxBuffer2, 1);
+	
+	//开启新增的串口接收
+	  HAL_UART_Receive_DMA(&huart3, (uint8_t *)&aRxBuffer3, 1);
+	//开启新增的串口接收
+	
+	  HAL_UART_Receive_DMA(&huart6, (uint8_t *)&aRxBuffer6, 1);
+	 HAL_UART_Receive_DMA(&huart7, (uint8_t *)&Depth_rx_buffer, 1);	
+
 	 
 	 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_13, GPIO_PIN_RESET);   //光纤
 	 HAL_GPIO_WritePin(GPIOD, GPIO_PIN_4, GPIO_PIN_SET);
@@ -444,7 +592,19 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-		current_time = HAL_GetTick();
+	  current_time = HAL_GetTick();
+	  
+if((current_time - last_uwb_time) > UWB_TIMEOUT)
+    {
+        uwb_valid_flag = false; // 当前时间与上一次uwb接收信号时间超过200ms，判断为uwb信号断开
+    }
+    else
+    {
+		uwb_valid_flag = true;  // 判断为uwb信号有效
+    }
+	  
+		
+	  
 	  //USART6->XSense惯导、UART7->深度传感器、USART2->光纤惯导、USART1->UWB
 		float tempu = 0.f;
 		float tempv = 0.f;
@@ -455,13 +615,33 @@ int main(void)
 		FloatToU8(speed_w/1000.f,w_vlocity);
 		
 	  
+	  
+//新增的：进入UWB解算程序
+	   if(rxd3_flag == 1)
+	  {
+		Xaxis=X_function(rxd3_buffer);
+		Yaxis=Y_function(rxd3_buffer);
+		  
+        FloatToU8(Xaxis, Xpos);
+        FloatToU8(Yaxis, Ypos);
+        
+        // 重置DR位置到当前UWB位置
+        DR_Reset(&dr, Xaxis, Yaxis, depth_num);
+   
+		rxd3_flag = 0; 
+	  }
+//新增的：进入UWB解算程序
+	      
+	  
+
+	  
+	  
 	  if(rxd2_flag == 1)//进入光纤惯导解算程序
 	  {
 			Angleadd = Angle_function(rxd2_buffer);
 			Angle -= Angleadd;
 			FloatToU8(Angle,yaw);
-		 
-			b++; 
+		  
 			attitude.yaw = Angle*M_PI/180;
 			DR_UpdateAttitude(&dr, &attitude, current_time);
 			rxd2_flag = 0;  
@@ -509,17 +689,22 @@ int main(void)
 		
 		DR_UpdateDepth(&dr, depth_num);
 		
-		//航位推算
-		if (current_time - last_position_update >= 20) { // 50Hz
+			//航位推算 - 只有当UWB信号无效时才使用DVL解算的位置
+		if (current_time - last_position_update >= 20) 
+			
+		{ // 50Hz
+			if(!uwb_valid_flag)  // 使用布尔值判断
+			{
             DR_UpdatePosition(&dr, current_time);
             last_position_update = current_time;
-
+				
             DR_GetPosition(&dr, &pos);
-						FloatToU8(pos.x,Xpos);
-						FloatToU8(pos.y,Ypos);
-            
+				
+            FloatToU8(pos.x,Xpos);
+            FloatToU8(pos.y,Ypos);
+            }
         }
-		
+		//航位推算 - 只有当UWB信号无效时才使用DVL解算的位置
 		
 		
 

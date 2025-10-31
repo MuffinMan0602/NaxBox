@@ -1,33 +1,120 @@
-T1C4C 000:206.241   SEGGER J-Link V8.58 Log File
-T1C4C 000:206.490   DLL Compiled: Aug  6 2025 12:29:52
-T1C4C 000:206.552   Logging started @ 2025-08-09 11:33
-T1C4C 000:206.608   Process: D:\work\keil\core\UV4\UV4.exe
-T1C4C 000:206.669 - 206.662ms 
-T1C4C 000:206.730 JLINK_SetWarnOutHandler(...)
-T1C4C 000:206.783 - 0.055ms 
-T1C4C 000:206.844 JLINK_OpenEx(...)
-T1C4C 155:109.152   
-  ***** Warning: 
-T1C4C 155:109.312   Out of sync , resynchronizing...
-T1C4C 155:109.504   
-  ***** Warning: 
-T1C4C 155:109.600   Out of sync , resynchronizing...
-T1C4C 155:109.760   
-  ***** Warning: 
-T1C4C 155:109.904   Out of sync , resynchronizing...
-T1C4C 155:110.048   
+T6EA54 002:646.218   SEGGER J-Link V8.24 Log File
+T6EA54 002:646.249   DLL Compiled: Mar 26 2025 15:29:23
+T6EA54 002:646.261   Logging started @ 2025-10-15 05:24
+T6EA54 002:646.264   Process: D:\Keil\UV4\UV4.exe
+T6EA54 002:646.267 - 18.495ms 
+T6EA54 002:646.272 JLINK_SetWarnOutHandler(...)
+T6EA54 002:646.275 - 0.003ms 
+T6EA54 002:646.278 JLINK_OpenEx(...)
+T6EA54 002:648.707   Firmware: J-Link ARM-OB STM32 compiled Aug 22 2012 19:52:04
+T6EA54 002:650.820   Firmware: J-Link ARM-OB STM32 compiled Aug 22 2012 19:52:04
+T6EA54 002:652.850   Hardware: V7.00
+T6EA54 002:652.862   S/N: 20090928
+T6EA54 002:652.866   OEM: SEGGER
+T6EA54 002:652.870   Feature(s): RDI,FlashDL,FlashBP,JFlash,GDB
+T6EA54 002:653.220   Bootloader: (FW returned invalid version)
+T6EA54 002:654.156   TELNET listener socket opened on port 19021
+T6EA54 002:658.108   WEBSRV WEBSRV_Init(): Starting webserver thread(s)
+T6EA54 002:658.296   WEBSRV Webserver running on local port 19080
+T6EA54 002:658.420   Looking for J-Link GUI Server exe at: D:\Keil\ARM\Segger\JLinkGUIServer.exe
+T6EA54 002:658.493   Looking for J-Link GUI Server exe at: C:\Program Files\SEGGER\JLink_V824\JLinkGUIServer.exe
+T6EA54 002:658.523   Forking J-Link GUI Server: C:\Program Files\SEGGER\JLink_V824\JLinkGUIServer.exe
+T6EA54 002:661.790   J-Link GUI Server info: "J-Link GUI server V8.24 "
+T6EA54 002:661.965 - 15.685ms returns "O.K."
+T6EA54 002:661.993 JLINK_GetEmuCaps()
+T6EA54 002:662.000 - 0.006ms returns 0x88EA5833
+T6EA54 002:662.012 JLINK_TIF_GetAvailable(...)
+T6EA54 002:662.302 - 0.290ms 
+T6EA54 002:662.310 JLINK_SetErrorOutHandler(...)
+T6EA54 002:662.314 - 0.003ms 
+T6EA54 002:662.321 JLINK_ExecCommand("ProjectFile = "D:\BLACK\daiDVL\BLACK1(GUANGXIAN)\MDK-ARM\JLinkSettings.ini"", ...). 
+T6EA54 002:664.394 - 2.072ms returns 0x00
+T6EA54 002:664.420 JLINK_ExecCommand("Device = STM32H753IITx", ...). 
+T6EA54 002:664.563   Flash bank @ 0x08000000: SFL: Parsing sectorization info from ELF file
+T6EA54 002:664.571     FlashDevice.SectorInfo[0]: .SectorSize = 0x00020000, .SectorStartAddr = 0x00000000
+T6EA54 002:664.576   FlashBank @0x08000000: Sectorization info from SFL ELF file ignored because sectorization override from DLL / XML file is active.
+T6EA54 002:664.792   Flash bank @ 0x08100000: SFL: Parsing sectorization info from ELF file
+T6EA54 002:664.800     FlashDevice.SectorInfo[0]: .SectorSize = 0x00020000, .SectorStartAddr = 0x00000000
+T6EA54 002:664.805   FlashBank @0x08100000: Sectorization info from SFL ELF file ignored because sectorization override from DLL / XML file is active.
+T6EA54 002:665.005   Flash bank @ 0x90000000: SFL: Parsing sectorization info from ELF file
+T6EA54 002:665.012     FlashDevice.SectorInfo[0]: .SectorSize = 0x00010000, .SectorStartAddr = 0x00000000
+T6EA54 002:675.826   Device "STM32H753II" selected.
+T6EA54 002:676.032 - 11.606ms returns 0x00
+T6EA54 002:676.042 JLINK_ExecCommand("DisableConnectionTimeout", ...). 
+T6EA54 002:676.048   ERROR: Unknown command
+T6EA54 002:676.053 - 0.006ms returns 0x01
+T6EA54 002:676.058 JLINK_GetHardwareVersion()
+T6EA54 002:676.061 - 0.003ms returns 70000
+T6EA54 002:676.065 JLINK_GetDLLVersion()
+T6EA54 002:676.068 - 0.002ms returns 82400
+T6EA54 002:676.071 JLINK_GetOEMString(...)
+T6EA54 002:676.075 JLINK_GetFirmwareString(...)
+T6EA54 002:676.078 - 0.002ms 
+T6EA54 002:676.084 JLINK_GetDLLVersion()
+T6EA54 002:676.086 - 0.002ms returns 82400
+T6EA54 002:676.090 JLINK_GetCompileDateTime()
+T6EA54 002:676.092 - 0.002ms 
+T6EA54 002:676.097 JLINK_GetFirmwareString(...)
+T6EA54 002:676.100 - 0.002ms 
+T6EA54 002:676.103 JLINK_GetHardwareVersion()
+T6EA54 002:676.106 - 0.002ms returns 70000
+T6EA54 002:676.110 JLINK_GetSN()
+T6EA54 002:676.113 - 0.002ms returns 20090928
+T6EA54 002:676.116 JLINK_GetOEMString(...)
+T6EA54 002:676.122 JLINK_TIF_Select(JLINKARM_TIF_SWD)
+T6EA54 002:676.990 - 0.867ms returns 0x00
+T6EA54 002:677.001 JLINK_HasError()
+T6EA54 002:677.007 JLINK_SetSpeed(5000)
+T6EA54 002:677.204 - 0.197ms 
+T6EA54 002:677.385 JLINK_HasError()
+T6EA54 002:677.391 JLINK_SetResetType(JLINKARM_RESET_TYPE_NORMAL)
+T6EA54 002:677.418 - 0.027ms returns JLINKARM_RESET_TYPE_NORMAL
+T6EA54 002:677.424 JLINK_Reset()
+T6EA54 002:677.738   ConfigTargetSettings() start
+T6EA54 002:677.748    J-Link Script File: Executing ConfigTargetSettings()
+T6EA54 002:677.758   ConfigTargetSettings() end - Took 9us
+T6EA54 002:677.763   InitTarget() start
+T6EA54 002:677.767    J-Link Script File: Executing InitTarget()
+T6EA54 002:678.104   SWD selected. Executing JTAG -> SWD switching sequence.
+T6EA54 002:683.204   DAP initialized successfully.
+T6EA54 002:716.840   InitTarget() end - Took 39.0ms
+T6EA54 002:717.755   Found SW-DP with ID 0x6BA02477
+T6EA54 002:723.718   Old FW that does not support reading DPIDR via DAP jobs
+T6EA54 002:729.446   DPv0 detected
+T6EA54 002:729.456   CoreSight SoC-400 or earlier
+T6EA54 002:729.470   Scanning AP map to find all available APs
+T6EA54 002:737.612   AP[3]: Stopped AP scan as end of AP map has been reached
+T6EA54 002:737.622   AP[0]: AHB-AP (IDR: 0x84770001, ADDR: 0x00000000)
+T6EA54 002:737.627   AP[1]: AHB-AP (IDR: 0x84770001, ADDR: 0x01000000)
+T6EA54 002:737.631   AP[2]: APB-AP (IDR: 0x54770002, ADDR: 0x02000000)
+T6EA54 002:737.636   Iterating through AP map to find AHB-AP to use
+T6EA54 002:744.199   AP[0]: Core found
+T6EA54 002:744.208   AP[0]: AHB-AP ROM base: 0xE00FE000
+T6EA54 002:747.475   CPUID register: 0x411FC271. Implementer code: 0x41 (ARM)
+T6EA54 002:750.593   Cache: L1 I/D-cache present
+T6EA54 002:750.601   Found Cortex-M7 r1p1, Little endian.
+T6EA54 002:751.160   -- Max. mem block: 0x00002C18
+T6EA54 002:752.014   Looking for J-Link GUI Server exe at: D:\Keil\ARM\Segger\JLinkGUIServer.exe
+T6EA54 002:752.084   Looking for J-Link GUI Server exe at: C:\Program Files\SEGGER\JLink_V824\JLinkGUIServer.exe
+T6EA54 002:752.108   Forking J-Link GUI Server: C:\Program Files\SEGGER\JLink_V824\JLinkGUIServer.exe
+T6EA54 002:755.341   J-Link GUI Server info: "J-Link GUI server V8.24 "
+T6EA54 011:353.958   
   ***** Error: 
-T1C4C 155:110.192   Cannot connect to J-Link
-T1C4C 155:110.848 - 154904.000ms returns "Cannot connect to J-Link"
-T1C4C 155:110.944 
-  ***** Warning: 
-T1C4C 155:111.008 API Error: API JLINK_GetHardwareVersion function called before JLINKARM_Open()
-T1C4C 155:111.104 JLINK_GetHardwareVersion()
-T1C4C 155:141.536   
-  ***** Error: 
-T1C4C 155:141.600   Cannot connect to J-Link.
-T1C4C 155:141.712 - 30.595ms 
-T1C4C 4085:644.544 JLINK_Close()
-T1C4C 4085:644.800 - 0.427ms
-T1C4C 4085:644.800   
-T1C4C 4085:644.800   Closed
+T6EA54 011:353.986   Specific core setup failed.
+T6EA54 011:353.993 - 8676.568ms 
+T6EA54 011:354.686 JLINK_GetId()
+T6EA54 011:355.458 - 0.772ms returns 0x6BA02477
+T6EA54 011:367.726 JLINK_GetFirmwareString(...)
+T6EA54 011:367.742 - 0.016ms 
+T6EA54 016:773.326 JLINK_Close()
+T6EA54 016:777.360   OnDisconnectTarget() start
+T6EA54 016:777.376    J-Link Script File: Executing OnDisconnectTarget()
+T6EA54 016:777.404   CPU_WriteMem(4 bytes @ 0x5C001004)
+T6EA54 016:778.052   CPU_WriteMem(4 bytes @ 0x5C001034)
+T6EA54 016:778.640   CPU_WriteMem(4 bytes @ 0x5C001054)
+T6EA54 016:779.224   OnDisconnectTarget() end - Took 1.84ms
+T6EA54 016:779.244   CPU_ReadMem(4 bytes @ 0xE0001000)
+T6EA54 016:779.812   CPU_WriteMem(4 bytes @ 0xE0001000)
+T6EA54 016:802.626 - 29.300ms
+T6EA54 016:802.640   
+T6EA54 016:802.644   Closed

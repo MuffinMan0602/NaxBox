@@ -1,6 +1,6 @@
 #include "Navigation.h"
 #include <string.h>
-
+#include <math.h>
 
 // ≥ı ºªØ
 void DR_Init(DeadReckoning_t* dr)
